@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+
 from django.db import IntegrityError
 from django.test import TestCase
 import mock
