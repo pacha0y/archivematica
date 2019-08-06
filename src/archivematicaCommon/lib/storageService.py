@@ -5,7 +5,7 @@ import os
 import platform
 import requests
 from requests.auth import AuthBase
-import urllib
+import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
 from django.conf import settings as django_settings
 
@@ -13,6 +13,7 @@ from django.conf import settings as django_settings
 from archivematicaFunctions import get_setting
 from common_metrics import ss_api_timer
 
+from six.moves import map
 
 LOGGER = logging.getLogger("archivematica.common")
 
@@ -87,7 +88,7 @@ def _storage_api_params():
     """Return API GET params username=USERNAME&api_key=KEY for use in URL."""
     username = get_setting("storage_service_user", "test")
     api_key = get_setting("storage_service_apikey", None)
-    return urllib.urlencode({"username": username, "api_key": api_key})
+    return six.moves.urllib.parse.urlencode({"username": username, "api_key": api_key})
 
 
 def _storage_relative_from_absolute(location_path, space_path):
@@ -216,8 +217,8 @@ def browse_location(uuid, path):
     with ss_api_timer(function="browse_location"):
         response = _storage_api_session().get(url, params=params)
     browse = response.json()
-    browse["entries"] = map(base64.b64decode, browse["entries"])
-    browse["directories"] = map(base64.b64decode, browse["directories"])
+    browse["entries"] = list(map(base64.b64decode, browse["entries"]))
+    browse["directories"] = list(map(base64.b64decode, browse["directories"]))
     browse["properties"] = {
         base64.b64decode(k): v for k, v in browse.get("properties", {}).items()
     }

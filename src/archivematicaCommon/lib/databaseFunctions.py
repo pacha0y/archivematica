@@ -20,6 +20,7 @@
 # @author Joseph Perry <joseph@artefactual.com>
 from __future__ import print_function
 
+from __future__ import absolute_import
 from functools import wraps
 import logging
 import string
@@ -31,6 +32,7 @@ import uuid
 from django.db import close_old_connections
 from django.utils import six, timezone
 from main.models import Agent, Derivation, Event, File, FPCommandOutput, SIP
+from six.moves import range
 
 from common_metrics import db_retry_timer
 
