@@ -52,4 +52,4 @@ wcwidth==0.1.7
 zipp==0.6.0
 
 # The following packages are considered to be unsafe in a requirements file:
-# setuptools
+# setuptools==41.0.1        # via opf-fido, pytest, tox
