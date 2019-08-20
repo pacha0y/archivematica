@@ -359,7 +359,9 @@ def _usage_check_directory_volume_size(path):
     """
     try:
         # Get volume size (in 1K blocks)
-        output = subprocess.check_output(["df", "--block-size", "1024", path])
+        output = subprocess.check_output(["df", "--block-size", "1024", path]).decode(
+            "utf8"
+        )
         # Second line returns disk usage-related values
         usage_summary = output.split("\n")[1]
         # Split value by whitespace and size (in blocks)
@@ -382,7 +384,7 @@ def _usage_get_directory_used_bytes(path):
     try:
         output = subprocess.check_output(
             ["du", "--one-file-system", "--bytes", "--summarize", path]
-        )
+        ).decode("utf8")
         return output.split("\t")[0]
     except OSError:
         logger.exception("No such directory: %s", path)
