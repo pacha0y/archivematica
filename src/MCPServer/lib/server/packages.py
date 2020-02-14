@@ -871,9 +871,13 @@ class SIP(Package):
                 sip_obj.currentpath = path
                 sip_obj.save()
         else:
-            sip_obj = models.SIP.objects.create(
-                uuid=uuid4(), currentpath=path, sip_type="SIP", diruuids=False
-            )
+            try:
+                sip_obj = models.SIP.objects.get(currentpath=path)
+                created = False
+            except models.SIP.DoesNotExist:
+                sip_obj = models.SIP.objects.create(
+                    uuid=uuid4(), currentpath=path, sip_type="SIP", diruuids=False
+                )
         logger.info(
             "SIP %s %s (%s)", sip_obj.uuid, "created" if created else "updated", path
         )
