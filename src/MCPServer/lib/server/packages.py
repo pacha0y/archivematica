@@ -736,38 +736,46 @@ class Package(object):
         logger.info(message, key, self.uuid, value, chain_link_id)
 
 
-class DIP(Package):
-    REPLACEMENT_PATH_STRING = r"%SIPDirectory%"
-    UNIT_VARIABLE_TYPE = "DIP"
-    JOB_UNIT_TYPE = "unitDIP"
-
+class SipDip(Package):
     @classmethod
     @auto_close_old_connections()
     def get_or_create_from_db_by_path(cls, path):
-        """Matches a directory to a database DIP by its appended UUID, or path.
-
-        Note that DIPs are represented using the SIP model in the database.
-        """
+        """Matches a directory to a database SIP by its appended UUID, or path."""
         path = path.replace(_get_setting("SHARED_DIRECTORY"), r"%sharedPath%", 1)
 
         sip_uuid = uuid_from_path(path)
         created = True
         if sip_uuid:
             sip_obj, created = models.SIP.objects.get_or_create(
-                uuid=sip_uuid, defaults={"currentpath": path, "diruuids": False}
+                uuid=sip_uuid,
+                defaults={"sip_type": "SIP", "currentpath": path, "diruuids": False},
             )
+            if not created and sip_obj.currentpath != path:
+                sip_obj.currentpath = path
+                sip_obj.save()
         else:
-            sip_obj = models.SIP.objects.create(
-                uuid=uuid4(), currentpath=path, diruuids=False
-            )
+            try:
+                sip_obj = models.SIP.objects.get(currentpath=path)
+                created = False
+            except models.SIP.DoesNotExist:
+                sip_obj = models.SIP.objects.create(
+                    uuid=uuid4(), currentpath=path, sip_type="SIP", diruuids=False
+                )
         logger.info(
-            "SIP (for DIP) %s %s (%s)",
+            "%s %s %s (%s)",
+            cls.UNIT_VARIABLE_TYPE,
             sip_obj.uuid,
             "created" if created else "updated",
             path,
         )
 
         return cls(path, sip_obj.uuid)
+
+
+class DIP(SipDip):
+    REPLACEMENT_PATH_STRING = r"%SIPDirectory%"
+    UNIT_VARIABLE_TYPE = "DIP"
+    JOB_UNIT_TYPE = "unitDIP"
 
     def reload(self):
         # reload is a no-op for DIPs
@@ -843,7 +851,7 @@ class Transfer(Package):
         return mapping
 
 
-class SIP(Package):
+class SIP(SipDip):
     REPLACEMENT_PATH_STRING = r"%SIPDirectory%"
     UNIT_VARIABLE_TYPE = "SIP"
     JOB_UNIT_TYPE = "unitSIP"
@@ -853,36 +861,6 @@ class SIP(Package):
 
         self.aip_filename = None
         self.sip_type = None
-
-    @classmethod
-    @auto_close_old_connections()
-    def get_or_create_from_db_by_path(cls, path):
-        """Matches a directory to a database SIP by its appended UUID, or path."""
-        path = path.replace(_get_setting("SHARED_DIRECTORY"), r"%sharedPath%", 1)
-
-        sip_uuid = uuid_from_path(path)
-        created = True
-        if sip_uuid:
-            sip_obj, created = models.SIP.objects.get_or_create(
-                uuid=sip_uuid,
-                defaults={"sip_type": "SIP", "currentpath": path, "diruuids": False},
-            )
-            if not created and sip_obj.currentpath != path:
-                sip_obj.currentpath = path
-                sip_obj.save()
-        else:
-            try:
-                sip_obj = models.SIP.objects.get(currentpath=path)
-                created = False
-            except models.SIP.DoesNotExist:
-                sip_obj = models.SIP.objects.create(
-                    uuid=uuid4(), currentpath=path, sip_type="SIP", diruuids=False
-                )
-        logger.info(
-            "SIP %s %s (%s)", sip_obj.uuid, "created" if created else "updated", path
-        )
-
-        return cls(path, sip_obj.uuid)
 
     @auto_close_old_connections()
     def reload(self):
