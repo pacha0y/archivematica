@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="job",
             name="sipuuid",
-            field=models.CharField(max_length=36, db_column=b"SIPUUID", db_index=True),
+            field=models.CharField(max_length=36, db_column="SIPUUID", db_index=True),
         ),
         migrations.AlterIndexTogether(
             name="job",
