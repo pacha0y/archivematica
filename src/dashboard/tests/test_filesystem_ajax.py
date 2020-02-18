@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import json
 import uuid
-from base64 import b64decode, b64encode
+from base64 import b64encode
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase

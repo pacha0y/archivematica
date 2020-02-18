@@ -1,18 +1,20 @@
 from __future__ import absolute_import
+
 import logging
 import os
 import platform
-import requests
-from requests.auth import AuthBase
-import six.moves.urllib.request, six.moves.urllib.parse, six.moves.urllib.error
 
-from django.conf import settings as django_settings
+import requests
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+from requests.auth import AuthBase
+from six.moves import map
 
 # archivematicaCommon
-from archivematicaFunctions import get_setting, b64decode_string, b64encode_string
+from archivematicaFunctions import b64decode_string, b64encode_string, get_setting
 from common_metrics import ss_api_timer
-
-from six.moves import map
+from django.conf import settings as django_settings
 
 LOGGER = logging.getLogger("archivematica.common")
 

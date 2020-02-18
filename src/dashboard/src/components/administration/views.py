@@ -31,7 +31,6 @@ from django.http import Http404, HttpResponseNotAllowed, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import RequestContext
 from django.template.defaultfilters import filesizeformat
-from django.utils.six.moves import map
 from django.utils.translation import ugettext as _
 
 from main import models
