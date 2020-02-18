@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """Migrate the Archivematica agent version string to Archivematica-1.11."""
+from __future__ import absolute_import
 from __future__ import unicode_literals
 
 from django.db import migrations
